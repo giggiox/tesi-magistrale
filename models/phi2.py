@@ -1,5 +1,4 @@
-# models/phi2.py
-from .model import Model
+from models.model import Model
 
 class Phi2(Model):
     def __init__(self, load_on_init=False):

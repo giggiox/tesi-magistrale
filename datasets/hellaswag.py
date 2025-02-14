@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from datasets.dataset import Dataset
 import re
 
 class HellaSwag(Dataset):

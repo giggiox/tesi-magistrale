@@ -1,5 +1,4 @@
-# models/tiny_llama_small.py
-from .model import Model
+from models.model import Model
 
 class TinyLLamaSmall(Model):
     def __init__(self, load_on_init=False):

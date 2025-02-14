@@ -1,4 +1,3 @@
-# main.py
 from models.phi2 import Phi2
 from models.tiny_llama_small import TinyLLamaSmall
 
