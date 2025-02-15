@@ -61,19 +61,19 @@ class Dataset():
         
     
     def evaluate_model(self, model, n_shot = 0, logger_manager = None):
-        correct = 0
-        pipe = model.get_pipeline()
-        dataset = self.get_dataset()
-        
         with LogToFile(logger_manager):
             logger_manager.write(f"Evaluating {model.get_model_name()} on {self.get_dataset_name()} with {n_shot}-shot\n")
-            
+
+        dataset = self.get_dataset()
+        correct = 0    
         for idx, example in tqdm(enumerate(dataset),total=len(dataset), desc=f"Evaluating {model.get_model_name()} on {self.get_dataset_name()}"):
             with LogToFile(logger_manager):
                 is_correct = self.iteration_evaluate_model(model, idx, example, n_shot, logger_manager)
                 if is_correct:
                     correct += 1
         accuracy = correct / (len(dataset)) * 100
+
         with LogToFile(logger_manager):
             logger_manager.write(f"\nFinal accuracy: {accuracy}")
+
         return accuracy
