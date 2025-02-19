@@ -1,6 +1,21 @@
 Questa repository contiene il codice per la Tesi magistrale su valutazione LLM
 
 
+Il codice può fare valutazione dei modelli
+- Phi-2
+- TinyLLama
+Sui dataset 
+- boolq
+- hellaswag
+- squad v2
+
+Il codice è stato fatto in modo che sia facile agggiungere nuovi modelli e dataset.
+
+
+E' in oltre possibile fare sia 0-shot che n-shot. Quello che ho notato per adesso è che anche solo 1-shot questi modelli piccoli riescono molto meglio a seguire il prompt.
+
+
+
 
 # Evaluating LLM(s)
 - [Open LLM Leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard#/): Leaderboard Hugging face dei modelli sui vari dataset
@@ -9,7 +24,7 @@ Questa repository contiene il codice per la Tesi magistrale su valutazione LLM
 2. trovare KPI, suggeriscono BLEU per la traduzione e ROUGE per la summarization
 3. valutare non solo sui dataset ma anche sulla user experience (collezionare feedback)
 4. Suggeriscono anche di fare Adversarial testing: dare al modello input controversi e vedere come reagisce
-5. [Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference](https://arxiv.org/pdf/2403.04132): Una piattaforma aperta che valuta le LLM basandosi sulla preferenza umana. Questa metodologia è particolarmente utile perché le metriche automatiche potrebbero non riflettere pienamente la qualità percepita delle risposte.
+- [Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference](https://arxiv.org/pdf/2403.04132): Una piattaforma aperta che valuta le LLM basandosi sulla preferenza umana. Questa metodologia è particolarmente utile perché le metriche automatiche potrebbero non riflettere pienamente la qualità percepita delle risposte.
 
 ### Altre cose interessanti su evaluation
 - https://github.com/cpldcpu/MisguidedAttention dataset con problemi noti e (probabilmente) over rapresentati nel training set, cambiati leggermente. Si vede che molte AI semplicemente rispondono al problema originale, senza tener conto che il problema è stato cambiato.
