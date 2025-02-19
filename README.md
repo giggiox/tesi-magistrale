@@ -1,13 +1,14 @@
 Questa repository contiene il codice per la Tesi magistrale su valutazione LLM
 
 
-Il codice può fare valutazione dei modelli
-- Phi-2
-- TinyLLama
+Il codice può fare (per ora) valutazione dei modelli
+1. Phi-2
+2.  TinyLLama
+
 Sui dataset 
-- boolq
-- hellaswag
-- squad v2
+1. boolq
+2. hellaswag
+3. squad v2
 
 Il codice è stato fatto in modo che sia facile agggiungere nuovi modelli e dataset.
 
