@@ -10,7 +10,7 @@ Sui dataset
 2. hellaswag
 3. squad v2
 
-Il codice è stato fatto in modo che sia facile agggiungere nuovi modelli e dataset.
+Il codice è stato fatto in modo che sia facile aggiungere nuovi modelli e dataset.
 
 
 E' in oltre possibile fare sia 0-shot che n-shot. Quello che ho notato per adesso è che anche solo 1-shot questi modelli piccoli riescono molto meglio a seguire il prompt.
