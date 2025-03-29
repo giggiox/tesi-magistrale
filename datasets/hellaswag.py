@@ -23,6 +23,13 @@ Note:
 2. label is from 0-3. We will pose the question to LLM as choose between 4 options indexed 1-4.
 
     """  
+
+    ANSWER = {
+        0:'A',
+        1:'B',
+        2:'C',
+        3:'D'
+    }
     
     def __init__(self, load_on_init = False, dataset_fraction = 1, split = "validation"):
         super().__init__(dataset_fraction, split)
@@ -40,32 +47,30 @@ Note:
     def format_prompt(self,example):
         """
         The example is formatted as
-        
+
+        Answer the following multiple choice question. The last line of your response should be in the following format: 'Answer: A/B/C/D' (e.g. 'Answer: A')
         Context: Then, the man writes over the snow covering the window of a car, and a woman wearing winter clothes smiles. then
         Which of the following options is the most plausible continuation?
-        1. The man adds wax to the windshield and cuts it.  
-        2. A person boards a ski lift, while two men support the head of the person.  
-        3. The woman walks away and the man starts removing the ice from the car.  
-        4. The man and woman start dancing on the snowy ground. 
-        Respond with only the number of the most plausible option: 
+        A. The man adds wax to the windshield and cuts it.  
+        B. A person boards a ski lift, while two men support the head of the person.  
+        C. The woman walks away and the man starts removing the ice from the car.  
+        D. The man and woman start dancing on the snowy ground. 
         """
         ctx = example['ctx']
         ctx = re.sub(r"\[.*?\]", "", ctx).strip() # Remove tags from context
         endings = example['endings']
         for i in range(len(endings)):
             endings[i] = re.sub(r"\[.*?\]", "", endings[i]).strip() # Remove tags from endings
-        return f"Context: {ctx}\nWhich of the following options is the most plausible continuation?\n1. {endings[0]}\n2. {endings[1]}\n3. {endings[2]}\n4. {endings[3]}\nRespond with only the number of the most plausible option:"
-
-    def clean_answer(self, answer, prompt):
-        return answer.split("\n")[0] # Take only first row of response, the other rows are usually the explaining
+        return f"Answer the following multiple choice question. The last line of your response should be in the following format: 'Answer: A/B/C/D' (e.g. 'Answer: A').\n Context: {ctx}\nWhich of the following options is the most plausible continuation?\nA. {endings[0]}\nB. {endings[1]}\nC. {endings[2]}\nD. {endings[3]}"
 
     def get_true_answer(self, example):
-        return str(int(example["label"]) + 1)
+        return f"Answer: {self.ANSWER[int(example['label'])]}"
 
     def is_correct(self, model_answer, row): 
-        """
-        true_answer is already 1-indexed by get_true_answer. 
-        true_answer \in [1,2,3,4]
-        """
-        true_answer = self.get_true_answer(row)
-        return str(true_answer) in model_answer
+        true_answer = self.ANSWER[int(row['label'])].lower()
+        prediction = re.search("(?i)[\*\_]{0,2}Answer[\*\_]{0,2}\s*:[\s\*\_]{0,2}\s*([A-Z])(?![a-zA-Z0-9])", model_answer)
+        
+        if prediction:
+            predicition_label = re.search(r"Answer:(.*)", prediction.group(0).lower(), re.IGNORECASE).group(1).lower().strip()
+            return predicition_label == true_answer, False
+        return False, True
