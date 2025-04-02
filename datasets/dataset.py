@@ -26,8 +26,7 @@ class Dataset():
     def iteration_evaluate_model(self, model, row_idx, row, n_shot, logger_manager = None):
         dataset = self.get_dataset()
 
-
-        # Code for n_shot prompting
+        # Code for n-shot prompting
         dataset_keys = list(range(len(dataset)))
         dataset_keys_filtered = dataset_keys[:row_idx] + dataset_keys[row_idx + 1:]
         dataset_filtered = dataset.select(dataset_keys_filtered)
@@ -35,45 +34,45 @@ class Dataset():
         for i in range(n_shot):
             shot_row = random.choice(dataset_filtered)
             prompt += self.format_prompt(shot_row) + " " + str(self.get_true_answer(shot_row)) + "\n"
-        
+
+        # Building the prompt
         prompt = prompt + self.format_prompt(row)
-        # prompt = model.format_prompt(prompt)
 
         # Ask model the prompt
         answer = model.get_pipeline()(prompt, return_full_text=False)[0]['generated_text']  
 
-        # Clean answer from the model
-        cleaned_answer = model.clean_answer(answer, prompt) # Each model has a unique way to reply
-        cleaned_answer = self.clean_answer(cleaned_answer, prompt) # Each dataset has a unique way to clean the answer
-        true_answer = self.get_true_answer(row) # For logging purposes
 
-
-        is_llm_answer_correct = self.is_correct(cleaned_answer, row)
+        is_llm_answer_correct, is_answer_rejected = self.is_correct(answer, row)
 
         if logger_manager:
             logger_manager.write(f"- Prompt:\n {prompt}\n")
             logger_manager.write(f"- Answer:\n {answer}\n")
-            logger_manager.write(f"- Cleaned Answer:\n {cleaned_answer}\n")
-            logger_manager.write(f"- True Answer: {true_answer}\n")
+            logger_manager.write(f"- True Answer: {self.get_true_answer(row)}\n")
             logger_manager.write(f"- Is LLM answer correct? : {is_llm_answer_correct}\n")
 
-        return is_llm_answer_correct
+        return is_llm_answer_correct, is_answer_rejected
         
     
     def evaluate_model(self, model, n_shot = 0, logger_manager = None):
+        correct = 0
+        rejected = 0
+        pipe = model.get_pipeline()
+        dataset = self.get_dataset()
+        
+        
         with LogToFile(logger_manager):
             logger_manager.write(f"Evaluating {model.get_model_name()} on {self.get_dataset_name()} with {n_shot}-shot\n")
-
-        dataset = self.get_dataset()
-        correct = 0    
-        for idx, example in tqdm(enumerate(dataset),total=len(dataset), desc=f"Evaluating {model.get_model_name()} on {self.get_dataset_name()}"):
+            
+        for idx, example in tqdm(enumerate(dataset),total=len(dataset), desc=f"Evaluating {model.get_model_name()} on {self.get_dataset_name()} with {n_shot}-shot"):
             with LogToFile(logger_manager):
-                is_correct = self.iteration_evaluate_model(model, idx, example, n_shot, logger_manager)
+                is_correct, is_answer_rejected = self.iteration_evaluate_model(model, idx, example, n_shot, logger_manager)
                 if is_correct:
                     correct += 1
+                if is_answer_rejected:
+                    rejected += 1
+                    
         accuracy = correct / (len(dataset)) * 100
-
         with LogToFile(logger_manager):
             logger_manager.write(f"\nFinal accuracy: {accuracy}")
-
+            logger_manager.write(f"\nNumber of rejected answers: {rejected}")
         return accuracy
