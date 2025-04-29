@@ -23,7 +23,7 @@ class Dataset():
         return self.dataset
 
 
-    def iteration_evaluate_model(self, model, row_idx, row, n_shot, logger_manager = None):
+    def iteration_evaluate_model(self, model, row_idx, row, n_shot, use_cot, logger_manager = None):
         dataset = self.get_dataset()
 
         # Code for n-shot prompting
@@ -33,10 +33,10 @@ class Dataset():
         prompt = ""
         for i in range(n_shot):
             shot_row = random.choice(dataset_filtered)
-            prompt += self.format_prompt(shot_row) + " " + str(self.get_true_answer(shot_row)) + "\n"
+            prompt += self.format_prompt(shot_row, use_cot) + " " + str(self.get_true_answer(shot_row)) + "\n"
 
         # Building the prompt
-        prompt = prompt + self.format_prompt(row)
+        prompt = prompt + self.format_prompt(row, use_cot)
 
         # Ask model the prompt
         answer = model.get_pipeline()(prompt, return_full_text=False)[0]['generated_text']  
@@ -53,7 +53,7 @@ class Dataset():
         return is_llm_answer_correct, is_answer_rejected
         
     
-    def evaluate_model(self, model, n_shot = 0, logger_manager = None):
+    def evaluate_model(self, model, n_shot = 0, use_cot = False, logger_manager = None):
         correct = 0
         rejected = 0
         pipe = model.get_pipeline()
@@ -65,7 +65,7 @@ class Dataset():
             
         for idx, example in tqdm(enumerate(dataset),total=len(dataset), desc=f"Evaluating {model.get_model_name()} on {self.get_dataset_name()} with {n_shot}-shot"):
             with LogToFile(logger_manager):
-                is_correct, is_answer_rejected = self.iteration_evaluate_model(model, idx, example, n_shot, logger_manager)
+                is_correct, is_answer_rejected = self.iteration_evaluate_model(model, idx, example, n_shot, use_cot, logger_manager)
                 if is_correct:
                     correct += 1
                 if is_answer_rejected:

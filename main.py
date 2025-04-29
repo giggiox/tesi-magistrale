@@ -16,6 +16,8 @@ model = Model("TinyLlama/TinyLlama-1.1B-Chat-v0.6", load_on_init=True)
 
 dataset = BoolQ(load_on_init = True)
 
-accuracy = dataset.evaluate_model(model, n_shot=2, logger_manager = logger_manager)
+accuracy = dataset.evaluate_model(model, n_shot = 0, 
+                                  use_cot = False,
+                                  logger_manager = logger_manager)
 
 logger_manager.write(f"Accuracy: {accuracy}")

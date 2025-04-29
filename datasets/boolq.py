@@ -24,7 +24,7 @@ Example (cropped):
     def get_dataset_name(self):
         return self.dataset_name
 
-    def format_prompt(self, example):
+    def format_prompt(self, example, use_cot):
         """
         Formats the example in this way:
         
@@ -32,7 +32,10 @@ Example (cropped):
         Passage: All biomass goes through at least some of these steps: it needs to be grown, collected, dried, fermented, distilled, and burned...
         Question: does ethanol take more energy make that produces
         """
-        return f"Answer the following true/false question. The last line of your response should be in the following format: 'Answer: true/false' (e.g. 'Answer: true').\nPassage: {example['passage']}\nQuestion: {example['question']}\n"
+        ret = f"Answer the following true/false question. The last line of your response should be in the following format: 'Answer: true/false' (e.g. 'Answer: true').\nPassage: {example['passage']}\nQuestion: {example['question']}\n"
+        if use_cot:
+            ret += "Let's think step by step"
+        return ret
 
 
     def get_true_answer(self, example):

@@ -44,7 +44,7 @@ Note:
     def get_dataset_name(self):
         return self.dataset_name
 
-    def format_prompt(self,example):
+    def format_prompt(self, example, use_cot):
         """
         The example is formatted as
 
@@ -61,7 +61,10 @@ Note:
         endings = example['endings']
         for i in range(len(endings)):
             endings[i] = re.sub(r"\[.*?\]", "", endings[i]).strip() # Remove tags from endings
-        return f"Answer the following multiple choice question. The last line of your response should be in the following format: 'Answer: A/B/C/D' (e.g. 'Answer: A').\n Context: {ctx}\nWhich of the following options is the most plausible continuation?\nA. {endings[0]}\nB. {endings[1]}\nC. {endings[2]}\nD. {endings[3]}"
+        ret = f"Answer the following multiple choice question. The last line of your response should be in the following format: 'Answer: A/B/C/D' (e.g. 'Answer: A').\n Context: {ctx}\nWhich of the following options is the most plausible continuation?\nA. {endings[0]}\nB. {endings[1]}\nC. {endings[2]}\nD. {endings[3]}\n"
+        if use_cot:
+            ret += "Let's think step by step"
+        return ret
 
     def get_true_answer(self, example):
         return f"Answer: {self.ANSWER[int(example['label'])]}"
