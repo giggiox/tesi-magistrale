@@ -49,6 +49,6 @@ class Model:
                 model=self.get_model(),
                 tokenizer=self.get_tokenizer(),
                 max_new_tokens=256,
-                temperature=0.1
+                temperature=0
             )
         return self.pipe
